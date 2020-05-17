@@ -32,8 +32,6 @@ class BaseAPI {
       type: objtype,
     });
 
-    console.log("vlaue", setvalue);
-
     const setCollection = await this.addSubject({ title: collection });
 
     const propertydefinition = {

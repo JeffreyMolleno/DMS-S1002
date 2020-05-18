@@ -1,6 +1,8 @@
 const { gql } = require("apollo-server-express");
 
 const typeDefs = gql`
+  union Result = Subject | Value | Property
+
   type Property {
     id: ID!
     subject: Subject #define the node
@@ -41,10 +43,27 @@ const typeDefs = gql`
       master: String
       collection: String
       type: String
-    ): Property
-    addSubject(title: String!): Subject
+    ): GeneralMutationResponse
+    addSubject(title: String!): GeneralMutationResponse
     # addType(title: String!): Subject
-    addValue(definition: String!, hold: String!, subject_id: ID!): Value #subject_id referes to the objtype
+    addValue(
+      definition: String!
+      hold: String!
+      subject_id: ID!
+    ): GeneralMutationResponse #subject_id referes to the objtype
+  }
+
+  type GeneralMutationResponse implements MutationResponse {
+    code: String!
+    success: Boolean!
+    message: String!
+    result: Result
+  }
+
+  interface MutationResponse {
+    code: String!
+    success: Boolean!
+    message: String!
   }
 `;
 

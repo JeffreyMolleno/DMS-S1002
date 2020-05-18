@@ -36,7 +36,7 @@ const resolvers = {
     //   return res;
     // },
     async addValue(parent, args, context, info) {
-      return await context.dataSources.Base.addValue({args});
+      return await context.dataSources.Base.addValue({ args });
     },
   },
   Property: {
@@ -50,18 +50,20 @@ const resolvers = {
       return parent.subject;
     },
   },
-  //   Result: {
-  //     _resolveType(obj, context, info) {
-  //       if (obj.username) return "User";
+  Result: {
+    __resolveType(obj, context, info) {
+      if (obj.title) return "Subject";
+      if (obj.definition) return "Value";
+      if (obj.subject) return "Property";
 
-  //       return null;
-  //     },
-  //   },
-  //   MutationsResponse: {
-  //     _resolveType(obj, context, info) {
-  //       return null;
-  //     },
-  //   },
+      return null;
+    },
+  },
+  MutationResponse: {
+    __resolveType(obj, context, info) {
+      return null;
+    },
+  },
 };
 
 module.exports = resolvers;

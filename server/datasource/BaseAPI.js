@@ -65,12 +65,19 @@ class BaseAPI {
   }
 
   async addSubject({ title }) {
-    const result = await this.context.db.subject.insert({
-      id: genKey("subject"),
-      title,
-    });
+    // check first if subject.title is alreay existing
+    const existing = await this.context.db.subject.where(`title='${title}'`);
 
-    return { result };
+    // if not then create one
+    if (existing.length === 0) {
+      const result = await this.context.db.subject.insert({
+        id: genKey("subject"),
+        title,
+      });
+      return { result };
+    }
+
+    return { result: existing[0] };
   }
 }
 

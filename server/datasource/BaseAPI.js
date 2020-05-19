@@ -20,16 +20,16 @@ class BaseAPI {
       master,
       collection,
       value,
-      objtype,
+      value_definition,
+      value_type,
     } = data;
 
     const setSubject = await this.addSubject({ title: subject });
 
     const setvalue = await this.addValue({
-      definition,
+      definition: value_definition,
       hold: value,
-      subject,
-      type: objtype,
+      type: value_type,
     });
 
     const setCollection = await this.addSubject({ title: collection });
@@ -39,7 +39,7 @@ class BaseAPI {
       subject: setSubject.result.id,
       definition,
       active,
-      value: setvalue.result.id,
+      value: setvalue.result ? setvalue.result.id : null,
       master,
       collection: setCollection.result.id,
     };
@@ -47,21 +47,24 @@ class BaseAPI {
     const result = await this.context.db.property.insert({
       ...propertydefinition,
     });
-    console.log(result);
-    return result;
+
+    return { result };
   }
 
-  async addValue({ definition, hold, subject_id, type } = {}) {
-    console.log("type", type);
-    const exptype = await this.addSubject({ title: type });
-    console.log(exptype.result.id);
-    const result = await this.context.db.value.insert({
-      id: genKey("value"),
-      definition,
-      hold,
-      type: exptype.result.id,
-    });
-    return { result };
+  async addValue({ definition, hold, type } = {}) {
+    if (hold) {
+      const exptype = await this.addSubject({ title: type });
+
+      const result = await this.context.db.value.insert({
+        id: genKey("value"),
+        definition,
+        hold,
+        type: exptype.result.id,
+      });
+
+      return { result };
+    }
+    return { definition, hold, type };
   }
 
   async addSubject({ title }) {
@@ -78,6 +81,32 @@ class BaseAPI {
     }
 
     return { result: existing[0] };
+  }
+  async getValuePropertyofSubject({ subject }) {
+    const result = await this.context.db.query(`SELECT * FROM property `)
+  }
+
+  async getAllValueProperty() {
+    const result = await this.context.db.query("SELECT * FROM property");
+    return result;
+  }
+
+  async getSubject({ id }) {
+    const result = await this.context.db.subject.where(`id='${id}'`);
+    return result[0];
+  }
+
+  async getValue({ id }) {
+    const result = await this.context.db.value.where(`id='${id}'`);
+    return result[0];
+  }
+
+  async getCollection({ title, id }) {
+    const result = await this.context.db.query(
+      `SELECT * FROM property INNER JOIN subject on property.collection = subject.id WHERE title = '${title}'`
+    );
+
+    return result;
   }
 }
 

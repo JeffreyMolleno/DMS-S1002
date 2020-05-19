@@ -1,7 +1,7 @@
 const resolvers = {
   Query: {
-    getAllGenericProperty(parent, args, context, info) {
-      return context.db;
+    async getAllGenericProperty(parent, args, context, info) {
+      return await context.dataSources.Base.getAllValueProperty();
     },
     getProperty(parent, args, context, info) {
       return null;
@@ -12,10 +12,10 @@ const resolvers = {
       // });
       return null;
     },
-    getCollection(parent, args, context, info) {
-      return context.db.filter((data) => {
-        console.log(data.collection, args.id);
-        return data.collection.subject == args.album;
+    async getCollection(parent, args, context, info) {
+      return await context.dataSources.Base.getCollection({
+        title: args.album,
+        id: args.id,
       });
     },
   },
@@ -29,31 +29,34 @@ const resolvers = {
       });
       return res;
     },
-    // async addType(parent, args, context, info) {
-    //   const res = await context.dataSources.Base.addSubject({
-    //     title: args.title,
-    //   });
-    //   return res;
-    // },
     async addValue(parent, args, context, info) {
       return await context.dataSources.Base.addValue({ args });
     },
   },
   Property: {
-    value(parent, args, context, info) {
-      return parent.value;
+    async subject(parent, args, context, info) {
+      return await context.dataSources.Base.getSubject({ id: parent.subject });
     },
-    collection(parent, args, context, info) {
-      return parent.collection;
+    async collection(parent, args, context, info) {
+      return await context.dataSources.Base.getSubject({
+        id: parent.collection,
+      });
     },
-    subject(parent, args, context, info) {
-      return parent.subject;
+    async value(parent, args, context, info) {
+      return await context.dataSources.Base.getValue({
+        id: parent.value,
+      });
+    },
+  },
+  Value: {
+    async type(parent, args, context, info) {
+      return await context.dataSources.Base.getSubject({ id: parent.type });
     },
   },
   Result: {
     __resolveType(obj, context, info) {
       if (obj.title) return "Subject";
-      if (obj.definition) return "Value";
+      if (obj.hold) return "Value";
       if (obj.subject) return "Property";
 
       return null;

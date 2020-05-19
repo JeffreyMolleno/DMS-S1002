@@ -19,7 +19,6 @@ exports.up = (pgm) => {
     },
     active: {
       type: "boolean",
-      notNull: true,
     },
     value: {
       type: "text",

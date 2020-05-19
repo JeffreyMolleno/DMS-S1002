@@ -14,35 +14,34 @@ const typeDefs = gql`
   }
 
   type Value {
-    id: ID!
+    id: ID
     definition: String!
     hold: String
     type: Subject!
   }
 
   type Subject {
-    id: ID!
-    title: String!
+    id: ID
+    title: String
   }
 
   type Query {
     getAllGenericProperty: [Property]
     getProperty: Property
     getNames: [Property]
-    getCollection(album: ID!): [Property]
+    getCollection(album: String, id: ID): [Property]
   }
 
   type Mutation {
     addValueProperty(
-      subject: String
+      subject: String!
       definition: String!
       active: Boolean
-      hold: String
-      objtype: String
       value: String
+      value_definition: String
+      value_type: String
       master: String
-      collection: String
-      type: String
+      collection: String!
     ): GeneralMutationResponse
     addSubject(title: String!): GeneralMutationResponse
     # addType(title: String!): Subject
@@ -51,6 +50,15 @@ const typeDefs = gql`
       hold: String!
       subject_id: ID!
     ): GeneralMutationResponse #subject_id referes to the objtype
+    addNewProperty(input: CreateNewProperty): GeneralMutationResponse
+  }
+
+  input CreateNewProperty {
+    subject: String!
+    definition: String
+    active: Boolean
+    master: String
+    collection: String
   }
 
   type GeneralMutationResponse implements MutationResponse {
